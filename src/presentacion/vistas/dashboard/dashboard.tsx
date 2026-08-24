@@ -71,9 +71,14 @@ export default function Dashboard() {
       <div className={estilos.gridMetricas}>
         <div className={`${estilos.tarjetaMetrica} ${estilos.tarjetaColorida} ${estilos.bgAzul}`}>
           <p className={estilos.encabezadoTarjeta}>Ventas del día</p>
-          <div className={estilos.centroTarjeta}>
-            <span className={estilos.iconoTarjeta}><DollarSign size={28} /></span>
-            <span className={estilos.valorTarjeta}>{formatearPrecio(totalVentasDelDia, 'USD')}</span>
+          <div className={estilos.centroTarjeta} style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span className={estilos.iconoTarjeta}><DollarSign size={28} /></span>
+              <span className={estilos.valorTarjeta}>{formatearPrecio(totalVentasDelDia, 'USD')}</span>
+            </div>
+            <span style={{ fontSize: '15px', color: 'rgba(255, 255, 255, 0.85)', paddingLeft: '40px', fontWeight: 500 }}>
+              {formatearPrecio(totalVentasDelDia * TASA_CAMBIO, 'VES')}
+            </span>
           </div>
           <div className={estilos.pieTarjeta}>
             <span>Transacciones completadas</span>

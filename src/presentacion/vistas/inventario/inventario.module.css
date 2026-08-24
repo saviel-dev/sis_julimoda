@@ -226,7 +226,7 @@
   padding: 0 var(--espacio-16);
   font-size: 14px;
   font-weight: 500;
-  color: var(--color-blanco);
+  color: #ffffff;
   background-color: var(--color-primario);
   border: none;
   border-radius: var(--radio-campo);
@@ -583,7 +583,7 @@
   padding: 0 var(--espacio-16);
   font-weight: 500;
   font-size: 13px;
-  color: var(--color-blanco);
+  color: #ffffff;
   background-color: var(--color-primario);
   border: none;
   border-radius: 6px;
@@ -643,7 +643,7 @@
   grid-template-columns: 1fr 1fr;
   gap: var(--espacio-24);
   padding: var(--espacio-24) var(--espacio-32);
-  background-color: #f8fafc;
+  background-color: var(--color-fondo);
   max-height: 65vh;
   overflow-y: auto;
 }

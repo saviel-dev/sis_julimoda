@@ -29,7 +29,7 @@
 .tituloCatalogo {
   font-size: 16px;
   font-weight: 500;
-  color: var(--color-blanco);
+  color: #ffffff;
   margin: 0;
 }
 
@@ -238,7 +238,7 @@
 .tituloCarrito {
   font-size: 14px;
   font-weight: 500;
-  color: var(--color-blanco);
+  color: #ffffff;
   margin: 0;
 }
 

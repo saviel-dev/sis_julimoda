@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Store, Receipt, Save, Tags, Plus, Trash2, Pencil, FolderOpen, X, Check } from 'lucide-react';
+import { Store, Receipt, Save, Tags, Plus, Trash2, Pencil, FolderOpen, X, Check, Users } from 'lucide-react';
 import Swal from 'sweetalert2';
 import estilos from './ajustes.module.css';
 
@@ -21,6 +21,41 @@ export default function Ajustes() {
   const [nuevaCategoria, setNuevaCategoria] = useState('');
   // Controla el hover desde React para evitar bugs con selectores compuestos en CSS Modules
   const [hoverId, setHoverId] = useState<number | null>(null);
+
+  // Usuarios simulados para la gestion de roles
+  const USUARIOS_DEMO = [
+    { id: '1', nombre: 'Julia (Admin)' },
+    { id: '2', nombre: 'Carlos (Vendedor)' },
+    { id: '3', nombre: 'Maria (Cajera)' },
+  ];
+
+  const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(USUARIOS_DEMO[0].id);
+
+  // Permisos simulados por usuario
+  const [permisos, setPermisos] = useState<Record<string, {
+    crearProducto: boolean;
+    editarProducto: boolean;
+    eliminarProducto: boolean;
+    vender: boolean;
+    verReportes: boolean;
+    ajustarTasa: boolean;
+    cambiarInformacion: boolean;
+    modificarCategorias: boolean;
+  }>>({
+    '1': { crearProducto: true, editarProducto: true, eliminarProducto: true, vender: true, verReportes: true, ajustarTasa: true, cambiarInformacion: true, modificarCategorias: true },
+    '2': { crearProducto: false, editarProducto: false, eliminarProducto: false, vender: true, verReportes: false, ajustarTasa: false, cambiarInformacion: false, modificarCategorias: false },
+    '3': { crearProducto: false, editarProducto: false, eliminarProducto: false, vender: true, verReportes: false, ajustarTasa: false, cambiarInformacion: false, modificarCategorias: false },
+  });
+
+  const manejarCambioPermiso = (permiso: keyof typeof permisos['1']) => {
+    setPermisos(prev => ({
+      ...prev,
+      [usuarioSeleccionado]: {
+        ...prev[usuarioSeleccionado],
+        [permiso]: !prev[usuarioSeleccionado][permiso]
+      }
+    }));
+  };
 
   // Confirmacion de guardado con SweetAlert2
   const manejarGuardar = async () => {
@@ -105,10 +140,7 @@ export default function Ajustes() {
 
       {/* ---- COLUMNA IZQUIERDA ---- */}
       <div className={estilos.columnaIzquierda}>
-        <header className={estilos.encabezado}>
-          <h1 className={estilos.titulo}>Ajustes del Sistema</h1>
-          <p className={estilos.descripcion}>Configura la informacion basica de tu emprendimiento.</p>
-        </header>
+
 
         {/* Informacion del Negocio */}
         <section className={estilos.seccion}>
@@ -149,6 +181,131 @@ export default function Ajustes() {
                 className={estilos.textarea}
                 defaultValue="Gracias por tu compra! Conserva este recibo para cambios (Maximo 15 dias)."
               />
+            </div>
+          </div>
+        </section>
+
+        {/* Gestion de Roles */}
+        <section className={estilos.seccion}>
+          <h2 className={estilos.tituloSeccion}>
+            <Users size={18} className={estilos.iconoSeccion} />
+            Gestion de Roles y Permisos
+          </h2>
+
+          <div className={estilos.formularioGrid}>
+            <div className={`${estilos.campoGrupo} ${estilos.campoGrupoFull}`}>
+              <label className={estilos.etiqueta}>Seleccionar Usuario</label>
+              <select
+                className={`${estilos.input} ${estilos.select}`}
+                value={usuarioSeleccionado}
+                onChange={(e) => setUsuarioSeleccionado(e.target.value)}
+              >
+                {USUARIOS_DEMO.map(user => (
+                  <option key={user.id} value={user.id}>{user.nombre}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className={`${estilos.campoGrupo} ${estilos.campoGrupoFull}`}>
+              <label className={estilos.etiqueta}>Permisos del usuario</label>
+              
+              <div className={estilos.listaPermisos}>
+                <label className={estilos.itemPermiso}>
+                  <span className={estilos.textoPermiso}>Crear productos</span>
+                  <div className={estilos.toggleSwitch}>
+                    <input 
+                      type="checkbox" 
+                      checked={permisos[usuarioSeleccionado]?.crearProducto || false}
+                      onChange={() => manejarCambioPermiso('crearProducto')}
+                    />
+                    <span className={estilos.toggleSlider}></span>
+                  </div>
+                </label>
+
+                <label className={estilos.itemPermiso}>
+                  <span className={estilos.textoPermiso}>Editar productos</span>
+                  <div className={estilos.toggleSwitch}>
+                    <input 
+                      type="checkbox" 
+                      checked={permisos[usuarioSeleccionado]?.editarProducto || false}
+                      onChange={() => manejarCambioPermiso('editarProducto')}
+                    />
+                    <span className={estilos.toggleSlider}></span>
+                  </div>
+                </label>
+
+                <label className={estilos.itemPermiso}>
+                  <span className={estilos.textoPermiso}>Eliminar productos</span>
+                  <div className={estilos.toggleSwitch}>
+                    <input 
+                      type="checkbox" 
+                      checked={permisos[usuarioSeleccionado]?.eliminarProducto || false}
+                      onChange={() => manejarCambioPermiso('eliminarProducto')}
+                    />
+                    <span className={estilos.toggleSlider}></span>
+                  </div>
+                </label>
+
+                <label className={estilos.itemPermiso}>
+                  <span className={estilos.textoPermiso}>Vender (Punto de Venta)</span>
+                  <div className={estilos.toggleSwitch}>
+                    <input 
+                      type="checkbox" 
+                      checked={permisos[usuarioSeleccionado]?.vender || false}
+                      onChange={() => manejarCambioPermiso('vender')}
+                    />
+                    <span className={estilos.toggleSlider}></span>
+                  </div>
+                </label>
+
+                <label className={estilos.itemPermiso}>
+                  <span className={estilos.textoPermiso}>Ver reportes</span>
+                  <div className={estilos.toggleSwitch}>
+                    <input 
+                      type="checkbox" 
+                      checked={permisos[usuarioSeleccionado]?.verReportes || false}
+                      onChange={() => manejarCambioPermiso('verReportes')}
+                    />
+                    <span className={estilos.toggleSlider}></span>
+                  </div>
+                </label>
+
+                <label className={estilos.itemPermiso}>
+                  <span className={estilos.textoPermiso}>Ajustar tasa de cambio</span>
+                  <div className={estilos.toggleSwitch}>
+                    <input 
+                      type="checkbox" 
+                      checked={permisos[usuarioSeleccionado]?.ajustarTasa || false}
+                      onChange={() => manejarCambioPermiso('ajustarTasa')}
+                    />
+                    <span className={estilos.toggleSlider}></span>
+                  </div>
+                </label>
+
+                <label className={estilos.itemPermiso}>
+                  <span className={estilos.textoPermiso}>Cambiar informacion del negocio</span>
+                  <div className={estilos.toggleSwitch}>
+                    <input 
+                      type="checkbox" 
+                      checked={permisos[usuarioSeleccionado]?.cambiarInformacion || false}
+                      onChange={() => manejarCambioPermiso('cambiarInformacion')}
+                    />
+                    <span className={estilos.toggleSlider}></span>
+                  </div>
+                </label>
+
+                <label className={estilos.itemPermiso}>
+                  <span className={estilos.textoPermiso}>Modificar categorias</span>
+                  <div className={estilos.toggleSwitch}>
+                    <input 
+                      type="checkbox" 
+                      checked={permisos[usuarioSeleccionado]?.modificarCategorias || false}
+                      onChange={() => manejarCambioPermiso('modificarCategorias')}
+                    />
+                    <span className={estilos.toggleSlider}></span>
+                  </div>
+                </label>
+              </div>
             </div>
           </div>
         </section>

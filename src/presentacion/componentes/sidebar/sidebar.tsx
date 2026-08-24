@@ -164,16 +164,7 @@ export default function Sidebar({ minimizada = false }: PropsSidebar) {
             </div>
           ))}
           
-          <div className={estilos.seccionNav} style={{ marginTop: 'var(--espacio-16)' }}>
-             <button 
-                className={estilos.itemNav} 
-                aria-label={minimizada ? "Soporte técnico" : undefined}
-                data-tooltip={minimizada ? "Soporte técnico" : undefined}
-             >
-                <span className={estilos.iconoNav}><Headset size={TAMANO_ICONO} /></span>
-                {!minimizada && <span className={estilos.textoNav}>Soporte técnico</span>}
-             </button>
-          </div>
+
         </div>
 
       </nav>
