@@ -1,0 +1,35 @@
+/* Estilos del botón primario */
+
+.boton {
+  width: 100%;
+  height: var(--alto-boton);
+  font-family: var(--fuente-familia);
+  font-size: var(--fuente-cuerpo);
+  font-weight: var(--fuente-peso);
+  color: var(--color-blanco);
+  background-color: var(--color-primario);
+  border: none;
+  border-radius: var(--radio-boton);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.boton:hover {
+  background-color: var(--color-primario-oscuro);
+}
+
+.boton:focus-visible {
+  outline: 2px solid var(--color-primario);
+  outline-offset: 2px;
+}
+
+.boton:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boton {
+    transition: none;
+  }
+}

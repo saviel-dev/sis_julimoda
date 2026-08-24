@@ -1,0 +1,38 @@
+/* Estilos del botón de visibilidad dentro del campo de contraseña */
+
+.contenedorContrasena {
+  position: relative;
+  width: 100%;
+}
+
+.botonVisibilidad {
+  position: absolute;
+  right: var(--espacio-16);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: var(--espacio-4);
+  cursor: pointer;
+  color: var(--color-texto-secundario);
+  border-radius: var(--espacio-4);
+  transition: color 0.2s;
+}
+
+.botonVisibilidad:hover {
+  color: var(--color-primario);
+}
+
+.botonVisibilidad:focus-visible {
+  outline: 2px solid var(--color-primario);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .botonVisibilidad {
+    transition: none;
+  }
+}

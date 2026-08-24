@@ -1,0 +1,127 @@
+/* Estilos del campo de texto outlined con etiqueta flotante estilo Google */
+
+.contenedor {
+  position: relative;
+  width: 100%;
+}
+
+.campo {
+  width: 100%;
+  height: var(--alto-campo);
+  padding: 0 var(--espacio-16);
+  font-family: var(--fuente-familia);
+  font-size: var(--fuente-cuerpo);
+  font-weight: var(--fuente-peso);
+  color: var(--color-texto);
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-campo);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.campo:focus {
+  border-width: 2px;
+  border-color: var(--color-primario);
+  /**
+   * Al pasar de 1px a 2px de borde, compensamos el padding
+   * para evitar que el contenido se desplace visualmente.
+   */
+  padding: 0 calc(var(--espacio-16) - 1px);
+}
+
+.campoConIcono {
+  padding-left: calc(var(--espacio-16) + var(--tamano-icono) + var(--espacio-8));
+}
+
+.campoConIcono:focus {
+  padding-left: calc(var(--espacio-16) + var(--tamano-icono) + var(--espacio-8) - 1px);
+}
+
+.campoError {
+  border-width: 2px;
+  border-color: var(--color-error);
+  padding: 0 calc(var(--espacio-16) - 1px);
+}
+
+.campoConIcono.campoError {
+  padding-left: calc(var(--espacio-16) + var(--tamano-icono) + var(--espacio-8) - 1px);
+}
+
+/* --- Etiqueta flotante --- */
+
+.etiqueta {
+  position: absolute;
+  left: var(--espacio-16);
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--fuente-familia);
+  font-size: var(--fuente-cuerpo);
+  font-weight: var(--fuente-peso);
+  color: var(--color-texto-secundario);
+  background-color: var(--color-blanco);
+  padding: 0 var(--espacio-4);
+  pointer-events: none;
+  transition: top 0.2s, font-size 0.2s, color 0.2s, transform 0.2s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .etiqueta {
+    transition: none;
+  }
+
+  .campo {
+    transition: none;
+  }
+}
+
+.etiquetaConIcono {
+  left: calc(var(--espacio-16) + var(--tamano-icono) + var(--espacio-8));
+}
+
+.etiquetaActiva {
+  top: 0;
+  transform: translateY(-50%);
+  font-size: var(--fuente-ayuda);
+  color: var(--color-primario);
+  /** Al flotar, la etiqueta siempre se alinea al borde izquierdo del campo */
+  left: calc(var(--espacio-16) - var(--espacio-4));
+}
+
+.etiquetaError {
+  color: var(--color-error);
+}
+
+/* --- Ícono --- */
+
+.icono {
+  position: absolute;
+  left: var(--espacio-16);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-texto-secundario);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.iconoActivo {
+  color: var(--color-primario);
+}
+
+.iconoError {
+  color: var(--color-error);
+}
+
+/* --- Mensaje de error --- */
+
+.mensajeError {
+  margin-top: var(--espacio-4);
+  font-family: var(--fuente-familia);
+  font-size: var(--fuente-ayuda);
+  font-weight: var(--fuente-peso);
+  color: var(--color-error);
+  line-height: 1.4;
+}

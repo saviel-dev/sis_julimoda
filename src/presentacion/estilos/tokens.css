@@ -1,0 +1,48 @@
+/**
+ * Tokens de diseño de JuliModa.
+ *
+ * Todos los colores, espaciados, tipografía y radios se definen
+ * aquí como variables CSS. Ningún componente debe usar valores
+ * hexadecimales sueltos.
+ */
+
+:root {
+  /* --- Paleta de colores --- */
+  --color-primario: #770dee;
+  --color-primario-oscuro: #6009c4;
+  --color-primario-suave: #f3e9fe;
+  --color-blanco: #ffffff;
+  --color-fondo: #fafafa;
+  --color-texto: #1f1f1f;
+  --color-texto-secundario: #5f6368;
+  --color-borde: #dadce0;
+  --color-error: #b3261e;
+
+  /* --- Tipografía --- */
+  --fuente-familia: 'Roboto', system-ui, -apple-system, sans-serif;
+  --fuente-titulo: 24px;
+  --fuente-cuerpo: 16px;
+  --fuente-ayuda: 12px;
+  --fuente-peso: 400;
+
+  /* --- Espaciado (múltiplos de 8px) --- */
+  --espacio-4: 4px;
+  --espacio-8: 8px;
+  --espacio-16: 16px;
+  --espacio-24: 24px;
+  --espacio-32: 32px;
+  --espacio-40: 40px;
+
+  /* --- Radios de borde --- */
+  --radio-campo: 8px;
+  --radio-boton: 24px;
+  --radio-tarjeta: 8px;
+
+  /* --- Dimensiones de campos --- */
+  --alto-campo: 56px;
+  --alto-boton: 40px;
+  --ancho-tarjeta-max: 400px;
+
+  /* --- Tamaño de íconos --- */
+  --tamano-icono: 24px;
+}
