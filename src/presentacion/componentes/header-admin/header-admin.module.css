@@ -69,7 +69,7 @@
   left: var(--espacio-16);
   top: 50%;
   transform: translateY(-50%);
-  color: var(--color-texto-terciario);
+  color: var(--color-texto-secundario);
 }
 
 .inputBuscador {
@@ -79,7 +79,7 @@
   font-family: var(--fuente-familia);
   font-size: var(--fuente-ayuda);
   color: var(--color-texto);
-  background-color: var(--color-fondo-admin);
+  background-color: var(--color-fondo);
   border: 1px solid transparent;
   border-radius: 20px;
   outline: none;
@@ -87,12 +87,81 @@
 }
 
 .inputBuscador::placeholder {
-  color: var(--color-texto-terciario);
+  color: var(--color-texto-secundario);
 }
 
 .inputBuscador:focus {
   background-color: var(--color-blanco);
   border-color: var(--color-primario);
+}
+
+.resultadosBusqueda {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  padding: 8px;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  z-index: 30;
+}
+
+.resultadoBusqueda {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 16px;
+  padding: 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-texto);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.resultadoBusqueda:hover,
+.resultadoBusqueda:focus-visible {
+  background-color: var(--color-fondo);
+  outline: none;
+}
+
+.iconoResultado {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--color-primario-suave);
+  color: var(--color-primario);
+}
+
+.textoResultado {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 4px;
+}
+
+.textoResultado strong,
+.textoResultado small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.textoResultado strong {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.textoResultado small {
+  color: var(--color-texto-secundario);
+  font-size: 12px;
 }
 
 /* --- Lado derecho: Acciones y Perfil --- */
@@ -137,8 +206,33 @@
 }
 
 .botonAccion:not(.botonAccionPrimario):hover {
-  background-color: var(--color-fondo-admin);
+  background-color: var(--color-fondo);
   color: var(--color-texto);
+}
+
+.botonAccion[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--color-texto);
+  color: var(--color-blanco);
+  font-family: var(--fuente-familia);
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  z-index: 40;
+}
+
+.botonAccion[data-tooltip]:hover::after {
+  opacity: 1;
+  visibility: visible;
 }
 
 .indicadorNotificacion {
@@ -152,11 +246,54 @@
   border: 2px solid var(--color-blanco);
 }
 
+.perfilContenedor {
+  position: relative;
+}
+
 .perfil {
+  background: transparent;
+  border: none;
+  padding: 0;
   display: flex;
   align-items: center;
   gap: var(--espacio-12, 12px);
   cursor: pointer;
+  text-align: left;
+}
+
+.menuPerfil {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 180px;
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  padding: 8px 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+}
+
+.itemMenuPerfil {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  color: var(--color-texto);
+  font-family: var(--fuente-familia);
+  font-size: 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.itemMenuPerfil:hover {
+  background-color: var(--color-fondo);
+  color: var(--color-error);
 }
 
 .infoPerfil {
@@ -175,8 +312,8 @@
 
 .rolPerfil {
   font-family: var(--fuente-familia);
-  font-size: 11px;
-  color: var(--color-texto-terciario);
+  font-size: 12px;
+  color: var(--color-texto-secundario);
 }
 
 .avatar {
@@ -188,7 +325,7 @@
 }
 
 .iconoDesplegable {
-  color: var(--color-texto-terciario);
+  color: var(--color-texto-secundario);
 }
 
 @media (max-width: 1024px) {

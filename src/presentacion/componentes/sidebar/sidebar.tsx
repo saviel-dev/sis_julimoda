@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   Package,
@@ -11,11 +11,9 @@ import {
   PieChart,
   Settings,
   Headset,
-  LogOut,
   Menu,
   X,
 } from 'lucide-react';
-import { sesionLocal } from '@/infraestructura/almacenamiento/sesion-local';
 import estilos from './sidebar.module.css';
 
 /** Tamaño de los íconos de navegación */
@@ -75,18 +73,16 @@ const NAVEGACION: SeccionNavegacion[] = [
   }
 ];
 
+interface PropsSidebar {
+  minimizada?: boolean;
+}
+
 /**
  * Sidebar de navegación lateral del sistema administrativo.
  */
-export default function Sidebar() {
+export default function Sidebar({ minimizada = false }: PropsSidebar) {
   const rutaActual = usePathname();
-  const router = useRouter();
   const [menuAbierto, setMenuAbierto] = useState(false);
-
-  const cerrarSesion = () => {
-    sesionLocal.eliminar();
-    router.push('/');
-  };
 
   const cerrarMenu = () => setMenuAbierto(false);
 
@@ -111,7 +107,7 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <nav
-        className={`${estilos.sidebar} ${menuAbierto ? estilos.sidebarAbierto : ''}`}
+        className={`${estilos.sidebar} ${menuAbierto ? estilos.sidebarAbierto : ''} ${minimizada ? estilos.minimizada : ''}`}
         aria-label="Navegación principal"
       >
         {/* Encabezado / Tienda */}
@@ -124,10 +120,12 @@ export default function Sidebar() {
             className={estilos.logoTienda}
             priority
           />
-          <div className={estilos.infoTienda}>
-            <span className={estilos.nombreTienda}>JuliModa</span>
-            <span className={estilos.direccionTienda}>Sede Central</span>
-          </div>
+          {!minimizada && (
+            <div className={estilos.infoTienda}>
+              <span className={estilos.nombreTienda}>JuliModa</span>
+              <span className={estilos.direccionTienda}>Sede Central</span>
+            </div>
+          )}
 
           {/* Botón cerrar en móvil */}
           <button
@@ -144,7 +142,7 @@ export default function Sidebar() {
         <div className={estilos.nav}>
           {NAVEGACION.map((seccion) => (
             <div key={seccion.titulo} className={estilos.seccionNav}>
-              {seccion.titulo && (
+              {seccion.titulo && !minimizada && (
                 <span className={estilos.seccionTitulo}>{seccion.titulo}</span>
               )}
               {seccion.items.map((item) => {
@@ -156,9 +154,10 @@ export default function Sidebar() {
                     className={`${estilos.itemNav} ${estaActivo ? estilos.itemNavActivo : ''}`}
                     onClick={cerrarMenu}
                     aria-current={estaActivo ? 'page' : undefined}
+                    data-tooltip={minimizada ? item.etiqueta : undefined}
                   >
                     <span className={estilos.iconoNav}>{item.icono}</span>
-                    <span className={estilos.textoNav}>{item.etiqueta}</span>
+                    {!minimizada && <span className={estilos.textoNav}>{item.etiqueta}</span>}
                   </Link>
                 );
               })}
@@ -166,25 +165,17 @@ export default function Sidebar() {
           ))}
           
           <div className={estilos.seccionNav} style={{ marginTop: 'var(--espacio-16)' }}>
-             <button className={estilos.itemNav}>
+             <button 
+                className={estilos.itemNav} 
+                aria-label={minimizada ? "Soporte técnico" : undefined}
+                data-tooltip={minimizada ? "Soporte técnico" : undefined}
+             >
                 <span className={estilos.iconoNav}><Headset size={TAMANO_ICONO} /></span>
-                <span className={estilos.textoNav}>Soporte técnico</span>
+                {!minimizada && <span className={estilos.textoNav}>Soporte técnico</span>}
              </button>
           </div>
         </div>
 
-        {/* Cerrar sesión */}
-        <div className={estilos.pie}>
-          <button
-            className={estilos.botonCerrarSesion}
-            onClick={cerrarSesion}
-          >
-            <span className={estilos.iconoNav}>
-              <LogOut size={TAMANO_ICONO} />
-            </span>
-            <span className={estilos.textoNav}>Cerrar sesión</span>
-          </button>
-        </div>
       </nav>
     </>
   );
