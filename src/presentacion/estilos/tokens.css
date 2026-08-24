@@ -7,16 +7,22 @@
  */
 
 :root {
-  /* --- Paleta de colores --- */
-  --color-primario: #770dee;
-  --color-primario-oscuro: #6009c4;
-  --color-primario-suave: #f3e9fe;
+  /* --- Paleta de colores (Estilo Referencia) --- */
+  --color-primario: #4361ee;
+  --color-primario-oscuro: #3a56d4;
+  --color-primario-suave: #eff4ff;
   --color-blanco: #ffffff;
   --color-fondo: #fafafa;
-  --color-texto: #1f1f1f;
-  --color-texto-secundario: #5f6368;
-  --color-borde: #dadce0;
-  --color-error: #b3261e;
+  --color-fondo-admin: #f4f7fe;
+  --color-texto: #1f2937;
+  --color-texto-secundario: #6b7280;
+  --color-texto-terciario: #9ca3af;
+  --color-borde: #e5e7eb;
+  --color-error: #ef4444;
+  --color-exito: #10b981;
+  --color-exito-suave: #d1fae5;
+  --color-alerta: #f59e0b;
+  --color-alerta-suave: #fef3c7;
 
   /* --- Tipografía --- */
   --fuente-familia: 'Roboto', system-ui, -apple-system, sans-serif;

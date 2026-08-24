@@ -1,0 +1,31 @@
+/* Layout del área administrativa */
+
+.contenedor {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--color-fondo-admin); /* Fondo general de la app (gris claro/azulado) */
+}
+
+.principal {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* Evita desbordamiento en flex */
+  overflow-x: hidden;
+}
+
+.contenido {
+  flex: 1;
+  padding: var(--espacio-24);
+  /* Opcional: si queremos que todo el contenido esté en una gran caja blanca */
+  /* background-color: var(--color-blanco);
+  margin: var(--espacio-24);
+  border-radius: var(--radio-tarjeta);
+  border: 1px solid var(--color-borde); */
+}
+
+@media (max-width: 768px) {
+  .principal {
+    /* En móvil el sidebar es overlay, el header sigue arriba */
+  }
+}

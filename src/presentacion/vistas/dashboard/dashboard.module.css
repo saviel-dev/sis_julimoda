@@ -1,0 +1,162 @@
+/* Estilos del dashboard */
+
+.pagina {
+  display: flex;
+  flex-direction: column;
+}
+
+.encabezado {
+  margin-bottom: var(--espacio-32);
+}
+
+.titulo {
+  font-size: var(--fuente-titulo);
+  font-weight: 500;
+  color: var(--color-texto);
+  margin: 0 0 var(--espacio-4) 0;
+}
+
+.subtitulo {
+  font-size: var(--fuente-ayuda);
+  color: var(--color-texto-secundario);
+  margin: 0;
+}
+
+/* --- Tarjetas de métricas --- */
+
+.gridMetricas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--espacio-16);
+  margin-bottom: var(--espacio-32);
+}
+
+.tarjetaMetrica {
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  padding: var(--espacio-24);
+  /* El borde superior de color se añadirá con una clase adicional o estilo en línea. 
+     Usaremos clases modificadoras. */
+}
+
+.bordeVerde { border-top: 3px solid var(--color-exito); }
+.bordeAzul { border-top: 3px solid var(--color-primario); }
+.bordeMorado { border-top: 3px solid #8b5cf6; } /* Un morado suave para inventario */
+.bordeRojo { border-top: 3px solid var(--color-error); }
+
+.etiquetaMetrica {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-8);
+  font-family: var(--fuente-familia);
+  font-size: var(--fuente-ayuda);
+  color: var(--color-texto-secundario);
+  margin: 0 0 var(--espacio-8) 0;
+}
+
+.iconoMetrica {
+  display: flex;
+}
+
+
+.valorMetrica {
+  font-family: var(--fuente-familia);
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--color-texto);
+  margin: 0 0 var(--espacio-4) 0;
+}
+
+.valorMetricaAlerta {
+  color: var(--color-error);
+}
+
+.descripcionMetrica {
+  font-family: var(--fuente-familia);
+  font-size: var(--fuente-ayuda);
+  color: var(--color-texto-secundario);
+  margin: 0;
+}
+
+/* --- Tabla de ventas recientes --- */
+
+.seccionTabla {
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  overflow: hidden;
+}
+
+.encabezadoTabla {
+  padding: var(--espacio-16) var(--espacio-24);
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.tituloTabla {
+  font-size: var(--fuente-cuerpo);
+  font-weight: 500;
+  color: var(--color-texto);
+  margin: 0;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla thead th {
+  font-family: var(--fuente-familia);
+  font-size: var(--fuente-ayuda);
+  font-weight: var(--fuente-peso);
+  color: var(--color-blanco);
+  text-align: left;
+  padding: var(--espacio-8) var(--espacio-24);
+  border-bottom: 1px solid var(--color-borde);
+  background-color: var(--color-primario);
+}
+
+.tabla tbody td {
+  font-family: var(--fuente-familia);
+  font-size: var(--fuente-ayuda);
+  color: var(--color-texto);
+  padding: var(--espacio-16) var(--espacio-24);
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.tabla tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.badgeCompletada {
+  display: inline-block;
+  font-size: var(--fuente-ayuda);
+  color: #1a7a3c;
+  background-color: #e6f4ec;
+  padding: 2px var(--espacio-8);
+  border-radius: 12px;
+}
+
+.badgePendiente {
+  display: inline-block;
+  font-size: var(--fuente-ayuda);
+  color: #b36200;
+  background-color: #fff3e0;
+  padding: 2px var(--espacio-8);
+  border-radius: 12px;
+}
+
+@media (max-width: 768px) {
+  .pagina {
+    padding: var(--espacio-16);
+  }
+
+  .gridMetricas {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .tabla thead th:nth-child(3),
+  .tabla tbody td:nth-child(3) {
+    display: none;
+  }
+}

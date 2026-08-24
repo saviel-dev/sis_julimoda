@@ -2,6 +2,8 @@
 
 Este repositorio contiene la interfaz web de inicio de sesión para **JuliModa**, una tienda de ropa. El proyecto ha sido diseñado priorizando la accesibilidad, la estética (con un fondo degradado y patrón cuadriculado leve) y una arquitectura limpia y escalable.
 
+![Previsualización de la interfaz de inicio de sesión](./src/assets/preview.png)
+
 ## Stack Tecnológico
 
 - **Framework:** Next.js (App Router)

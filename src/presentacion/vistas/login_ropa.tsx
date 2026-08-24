@@ -3,33 +3,36 @@
 import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Lock } from 'lucide-react';
 import {
   esquemaInicioSesion,
   type DatosInicioSesion,
 } from '@/aplicacion/esquemas/esquema-inicio-sesion';
+import { IniciarSesion } from '@/aplicacion/casos-uso/iniciar-sesion';
+import { AdaptadorAutenticacion } from '@/infraestructura/api/adaptador-autenticacion';
+import { sesionLocal } from '@/infraestructura/almacenamiento/sesion-local';
+import { CredencialesInvalidasError } from '@/dominio/errores/credenciales-invalidas-error';
 import CampoTexto from '@/presentacion/componentes/campo-texto/campo-texto';
 import CampoContrasena from '@/presentacion/componentes/campo-contrasena/campo-contrasena';
 import BotonPrimario from '@/presentacion/componentes/boton-primario/boton-primario';
 import estilos from './login_ropa.module.css';
 
-/** Tamaño de los íconos del formulario en píxeles */
-const TAMANO_ICONO = 20;
-
 /**
  * Vista principal del formulario de inicio de sesión de JuliModa.
  *
- * Integra React Hook Form con Zod para validación y usa los
- * componentes de presentación (CampoTexto, CampoContrasena,
- * BotonPrimario). No contiene lógica de negocio.
+ * Conecta React Hook Form con el caso de uso IniciarSesion inyectando
+ * el AdaptadorAutenticacion. Al autenticarse correctamente, guarda la
+ * sesión en sessionStorage y redirige al panel administrativo.
  */
 export default function LoginRopa() {
   const [errorGeneral, setErrorGeneral] = useState('');
+  const router = useRouter();
 
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<DatosInicioSesion>({
     resolver: zodResolver(esquemaInicioSesion),
@@ -39,17 +42,25 @@ export default function LoginRopa() {
     },
   });
 
-  const alEnviar = async (_datos: DatosInicioSesion) => {
+  const alEnviar = async (datos: DatosInicioSesion) => {
     setErrorGeneral('');
 
-    /**
-     * Aquí se inyectaría el caso de uso IniciarSesion con el
-     * adaptador de autenticación cuando el backend esté disponible.
-     *
-     * Ejemplo:
-     * const casoUso = new IniciarSesion(new AdaptadorAutenticacion());
-     * const sesion = await casoUso.ejecutar(datos.identificador, datos.contrasena);
-     */
+    try {
+      const casoUso = new IniciarSesion(new AdaptadorAutenticacion());
+      const sesion = await casoUso.ejecutar(datos.identificador, datos.contrasena);
+
+      sesionLocal.guardar(sesion);
+
+      /* Oculta la contraseña del estado antes de redirigir */
+      reset();
+      router.push('/admin/dashboard');
+    } catch (error) {
+      if (error instanceof CredencialesInvalidasError) {
+        setErrorGeneral(error.message);
+      } else {
+        setErrorGeneral('Ocurrió un error al intentar iniciar sesión. Inténtalo de nuevo.');
+      }
+    }
   };
 
   return (
