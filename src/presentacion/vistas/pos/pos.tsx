@@ -9,10 +9,14 @@ import {
   type Producto,
   type CategoriaProducto,
 } from '@/compartido/datos-demo';
+import { Image as ImageIcon, X } from 'lucide-react';
+import Recibo from '@/presentacion/componentes/recibo/recibo';
 import estilos from './pos.module.css';
 
 interface ItemCarrito {
+  idVirtual: string;
   producto: Producto;
+  talla: string;
   cantidad: number;
 }
 
@@ -27,8 +31,14 @@ export default function Pos() {
   const [carrito, setCarrito] = useState<ItemCarrito[]>([]);
   const [busqueda, setBusqueda] = useState('');
   const [categoriaFiltro, setCategoriaFiltro] = useState<CategoriaProducto | ''>('');
-  const [descuento, setDescuento] = useState(0);
   const [toastVisible, setToastVisible] = useState(false);
+  const [productoSeleccionado, setProductoSeleccionado] = useState<Producto | null>(null);
+  const [reciboData, setReciboData] = useState<{
+    items: ItemCarrito[];
+    subtotal: number;
+    total: number;
+    fecha: string;
+  } | null>(null);
 
   /* Productos filtrados para el catálogo */
   const productosFiltrados = PRODUCTOS_DEMO.filter((p) => {
@@ -38,25 +48,26 @@ export default function Pos() {
   });
 
   /** Agrega un producto al carrito o incrementa su cantidad */
-  const agregarAlCarrito = (producto: Producto) => {
+  const agregarAlCarrito = (producto: Producto, talla: string) => {
+    const idVirtual = `${producto.id}-${talla}`;
     setCarrito((prev) => {
-      const existente = prev.find((item) => item.producto.id === producto.id);
+      const existente = prev.find((item) => item.idVirtual === idVirtual);
       if (existente) {
         return prev.map((item) =>
-          item.producto.id === producto.id
+          item.idVirtual === idVirtual
             ? { ...item, cantidad: item.cantidad + 1 }
             : item
         );
       }
-      return [...prev, { producto, cantidad: 1 }];
+      return [...prev, { idVirtual, producto, talla, cantidad: 1 }];
     });
   };
 
   /** Incrementa la cantidad de un ítem del carrito */
-  const incrementar = (id: string) => {
+  const incrementar = (idVirtual: string) => {
     setCarrito((prev) =>
       prev.map((item) =>
-        item.producto.id === id
+        item.idVirtual === idVirtual
           ? { ...item, cantidad: item.cantidad + 1 }
           : item
       )
@@ -64,16 +75,25 @@ export default function Pos() {
   };
 
   /** Decrementa la cantidad o elimina el ítem si llega a 0 */
-  const decrementar = (id: string) => {
+  const decrementar = (idVirtual: string) => {
     setCarrito((prev) =>
       prev
         .map((item) =>
-          item.producto.id === id
+          item.idVirtual === idVirtual
             ? { ...item, cantidad: item.cantidad - 1 }
             : item
         )
         .filter((item) => item.cantidad > 0)
     );
+  };
+
+  const manejarClickProducto = (producto: Producto) => {
+    if (producto.tallas.length <= 1) {
+      const talla = producto.tallas.length === 1 ? producto.tallas[0].nombre : 'Única';
+      agregarAlCarrito(producto, talla);
+    } else {
+      setProductoSeleccionado(producto);
+    }
   };
 
   /* Cálculos del resumen */
@@ -84,14 +104,18 @@ export default function Pos() {
     },
     0
   );
-  const valorDescuento = Math.min(descuento, subtotal);
-  const total = subtotal - valorDescuento;
+  const total = subtotal;
   const cantidadItems = carrito.reduce((suma, item) => suma + item.cantidad, 0);
 
   /** Confirma la venta y limpia el carrito */
   const confirmarVenta = () => {
+    setReciboData({
+      items: [...carrito],
+      subtotal,
+      total,
+      fecha: new Date().toLocaleString('es-VE', { dateStyle: 'short', timeStyle: 'short' })
+    });
     setCarrito([]);
-    setDescuento(0);
     setToastVisible(true);
     setTimeout(() => setToastVisible(false), 3000);
   };
@@ -100,9 +124,12 @@ export default function Pos() {
     <div className={estilos.pagina}>
       {/* Panel izquierdo: catálogo */}
       <section className={estilos.catalogo} aria-label="Catálogo de productos">
-        <h1 className={estilos.tituloCatalogo}>Punto de venta</h1>
+        <div className={estilos.encabezadoCatalogo}>
+          <h1 className={estilos.tituloCatalogo}>Punto de venta</h1>
+        </div>
 
-        {/* Filtros */}
+        <div className={estilos.cuerpoCatalogo}>
+          {/* Filtros */}
         <div className={estilos.filtros}>
           <input
             className={estilos.campoBusqueda}
@@ -127,21 +154,45 @@ export default function Pos() {
 
         {/* Grilla de productos */}
         <div className={estilos.gridProductos}>
-          {productosFiltrados.map((producto) => (
-            <button
-              key={producto.id}
-              className={estilos.tarjetaProducto}
-              onClick={() => agregarAlCarrito(producto)}
-              aria-label={`Agregar ${producto.nombre} al carrito`}
-            >
-              <p className={estilos.nombreProducto}>{producto.nombre}</p>
-              <p className={estilos.metaProducto}>
-                Tallas: {producto.tallas.length > 0 ? producto.tallas.map(t => t.nombre).join(', ') : 'Única'}
-              </p>
-              <p className={estilos.precioProducto}>{formatearPrecio(producto.precio, producto.moneda)}</p>
-              <p className={estilos.stockProducto}>Stock: {producto.stock}</p>
-            </button>
-          ))}
+          {productosFiltrados.map((producto) => {
+            const precioUSD = producto.moneda === 'USD' ? producto.precio : producto.precio / TASA_CAMBIO;
+            const precioVES = producto.moneda === 'VES' ? producto.precio : producto.precio * TASA_CAMBIO;
+
+            return (
+              <button
+                key={producto.id}
+                className={estilos.tarjetaProducto}
+                onClick={() => manejarClickProducto(producto)}
+                aria-label={`Seleccionar ${producto.nombre}`}
+              >
+                <div className={estilos.imagenProductoContenedor}>
+                  {producto.foto ? (
+                    <img src={producto.foto} alt={producto.nombre} className={estilos.imagenProducto} />
+                  ) : (
+                    <div className={estilos.imagenPlaceholder}>
+                      <ImageIcon size={32} className={estilos.iconoPlaceholder} />
+                    </div>
+                  )}
+                </div>
+                <div className={estilos.infoProducto}>
+                  <p className={estilos.nombreProducto}>{producto.nombre}</p>
+                  <p className={estilos.metaProducto}>
+                    Tallas: {producto.tallas.length > 0 ? producto.tallas.map(t => t.nombre).join(', ') : 'Única'}
+                  </p>
+                  <div className={estilos.preciosProducto}>
+                    <p className={estilos.precioPrincipal}>
+                      {formatearPrecio(precioUSD, 'USD')}
+                    </p>
+                    <p className={estilos.precioSecundario}>
+                      {formatearPrecio(precioVES, 'VES')}
+                    </p>
+                  </div>
+                  <p className={estilos.stockProducto}>Stock: {producto.stock}</p>
+                </div>
+              </button>
+              );
+            })}
+          </div>
         </div>
       </section>
 
@@ -161,17 +212,23 @@ export default function Pos() {
             </p>
           )}
           {carrito.map((item) => (
-            <div key={item.producto.id} className={estilos.itemCarrito}>
+            <div key={item.idVirtual} className={estilos.itemCarrito}>
               <div className={estilos.infoItemCarrito}>
                 <p className={estilos.nombreItemCarrito}>{item.producto.nombre}</p>
-                <p className={estilos.precioItemCarrito}>
-                  {formatearPrecio(item.producto.precio, item.producto.moneda)} c/u
-                </p>
+                <p className={estilos.metaItemCarrito}>Talla: {item.talla}</p>
+                <div className={estilos.preciosItemCarrito}>
+                  <span className={estilos.precioDolares}>
+                    {formatearPrecio(item.producto.moneda === 'USD' ? item.producto.precio : item.producto.precio / TASA_CAMBIO, 'USD')} c/u
+                  </span>
+                  <span className={estilos.precioBolivares}>
+                    {formatearPrecio(item.producto.moneda === 'VES' ? item.producto.precio : item.producto.precio * TASA_CAMBIO, 'VES')} c/u
+                  </span>
+                </div>
               </div>
               <div className={estilos.controlesItem}>
                 <button
                   className={estilos.botonCantidad}
-                  onClick={() => decrementar(item.producto.id)}
+                  onClick={() => decrementar(item.idVirtual)}
                   aria-label={`Quitar una unidad de ${item.producto.nombre}`}
                 >
                   −
@@ -179,7 +236,7 @@ export default function Pos() {
                 <span className={estilos.cantidadItem}>{item.cantidad}</span>
                 <button
                   className={estilos.botonCantidad}
-                  onClick={() => incrementar(item.producto.id)}
+                  onClick={() => incrementar(item.idVirtual)}
                   aria-label={`Agregar una unidad más de ${item.producto.nombre}`}
                 >
                   +
@@ -192,24 +249,20 @@ export default function Pos() {
         {/* Resumen de precios */}
         <div className={estilos.resumen}>
           <div className={estilos.filaResumen}>
-            <span>Subtotal</span>
+            <span>Subtotal (USD)</span>
             <span>{formatearPrecio(subtotal, 'USD')}</span>
           </div>
           <div className={estilos.filaResumen}>
-            <label htmlFor="campo-descuento">Descuento (USD)</label>
-            <input
-              id="campo-descuento"
-              className={estilos.campoDescuento}
-              type="number"
-              min={0}
-              max={subtotal}
-              value={descuento}
-              onChange={(e) => setDescuento(Math.max(0, Number(e.target.value)))}
-            />
+            <span>Subtotal (Bs.)</span>
+            <span>{formatearPrecio(subtotal * TASA_CAMBIO, 'VES')}</span>
           </div>
           <div className={estilos.filaTotal}>
-            <span>Total</span>
+            <span>Total USD</span>
             <strong>{formatearPrecio(total, 'USD')}</strong>
+          </div>
+          <div className={estilos.filaTotalSecundario}>
+            <span>Total Bs.</span>
+            <strong>{formatearPrecio(total * TASA_CAMBIO, 'VES')}</strong>
           </div>
         </div>
 
@@ -225,13 +278,62 @@ export default function Pos() {
           {carrito.length > 0 && (
             <button
               className={estilos.botonLimpiar}
-              onClick={() => { setCarrito([]); setDescuento(0); }}
+              onClick={() => { setCarrito([]); }}
             >
               Limpiar carrito
             </button>
           )}
         </div>
       </aside>
+
+      {/* Modal Selección de Talla */}
+      {productoSeleccionado && (
+        <div className={estilos.overlayModal}>
+          <div className={estilos.modal} role="dialog" aria-modal="true" aria-labelledby="titulo-modal-talla">
+            <div className={estilos.encabezadoModal}>
+              <h2 id="titulo-modal-talla" className={estilos.tituloModal}>Seleccionar Talla</h2>
+              <button 
+                type="button" 
+                className={estilos.botonCerrar} 
+                onClick={() => setProductoSeleccionado(null)}
+                aria-label="Cerrar"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <p className={estilos.textoModalInfo}>{productoSeleccionado.nombre}</p>
+
+            <div className={estilos.gridTallas}>
+              {productoSeleccionado.tallas.map(t => (
+                <button 
+                  key={t.nombre}
+                  className={estilos.botonTalla}
+                  onClick={() => {
+                    agregarAlCarrito(productoSeleccionado, t.nombre);
+                    setProductoSeleccionado(null);
+                  }}
+                  disabled={t.cantidad <= 0}
+                >
+                  <span className={estilos.nombreTalla}>{t.nombre}</span>
+                  <span className={estilos.stockTalla}>{t.cantidad} disp.</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Recibo de venta con descarga como imagen */}
+      {reciboData && (
+        <Recibo
+          items={reciboData.items}
+          subtotal={reciboData.subtotal}
+          total={reciboData.total}
+          fecha={reciboData.fecha}
+          alCerrar={() => setReciboData(null)}
+        />
+      )}
 
       {/* Toast de confirmación */}
       {toastVisible && (

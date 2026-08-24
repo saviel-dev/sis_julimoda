@@ -52,3 +52,19 @@
   /* --- Tamaño de íconos --- */
   --tamano-icono: 24px;
 }
+
+html.tema-oscuro {
+  /* Estética tipo Supabase */
+  --color-blanco: #232323;         /* Tarjetas y superficies */
+  --color-fondo: #1c1c1c;          /* Fondo del sitio web */
+  --color-fondo-admin: #181818;    /* Fondo del layout principal */
+  --color-texto: #ededed;          /* Texto principal de alto contraste */
+  --color-texto-secundario: #8b8b8b; /* Texto de ayuda o secundario */
+  --color-texto-terciario: #5c5c5c;
+  --color-borde: #333333;          /* Bordes de tarjetas y divisiones */
+  
+  /* Ajustes para fondos interactivos y alertas en modo nocturno */
+  --color-primario-suave: #2a2a2a; 
+  --color-exito-suave: #1c3026;
+  --color-alerta-suave: #3a2a18;
+}

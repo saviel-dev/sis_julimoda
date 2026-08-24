@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Search, 
   Activity, 
@@ -15,6 +15,8 @@ import {
   PieChart,
   SlidersHorizontal,
   LogOut,
+  Sun,
+  Moon
 } from 'lucide-react';
 import Image from 'next/image';
 import { PRODUCTOS_DEMO, VENTAS_RECIENTES_DEMO } from '@/compartido/datos-demo';
@@ -55,6 +57,27 @@ export default function HeaderAdmin({ minimizada, onToggleMinimizar }: PropsHead
   const router = useRouter();
   const [busqueda, setBusqueda] = useState('');
   const [menuPerfilAbierto, setMenuPerfilAbierto] = useState(false);
+  const [temaOscuro, setTemaOscuro] = useState(false);
+
+  useEffect(() => {
+    const temaGuardado = localStorage.getItem('julimoda-tema');
+    if (temaGuardado === 'oscuro') {
+      setTemaOscuro(true);
+      document.documentElement.classList.add('tema-oscuro');
+    }
+  }, []);
+
+  const toggleTema = () => {
+    if (temaOscuro) {
+      document.documentElement.classList.remove('tema-oscuro');
+      localStorage.setItem('julimoda-tema', 'claro');
+      setTemaOscuro(false);
+    } else {
+      document.documentElement.classList.add('tema-oscuro');
+      localStorage.setItem('julimoda-tema', 'oscuro');
+      setTemaOscuro(true);
+    }
+  };
   
   const cerrarSesion = () => {
     sesionLocal.eliminar();
@@ -159,6 +182,16 @@ export default function HeaderAdmin({ minimizada, onToggleMinimizar }: PropsHead
       {/* Acciones y Perfil */}
       <div className={estilos.ladoDerecho}>
         <div className={estilos.acciones}>
+          <button 
+            onClick={toggleTema}
+            className={`${estilos.botonAccion} ${estilos.botonTema}`}
+            aria-label="Alternar tema"
+            data-tooltip={temaOscuro ? "Tema claro" : "Tema oscuro"}
+          >
+            <div className={`${estilos.iconoTema} ${temaOscuro ? estilos.animacionGirar : estilos.animacionGirarReverse}`}>
+              {temaOscuro ? <Moon size={20} /> : <Sun size={20} />}
+            </div>
+          </button>
           <Link 
             href="/admin/reportes" 
             className={estilos.botonAccion} 

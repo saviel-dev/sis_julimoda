@@ -1,0 +1,300 @@
+/* Estilos del componente Recibo de venta */
+
+/* --- Overlay y contenedor --- */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(31, 31, 31, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  padding: 16px;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.9); opacity: 0; }
+  60% { transform: scale(1.02); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.contenedor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-height: 95vh;
+  overflow-y: auto;
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* --- Barra de acciones (fuera del ticket) --- */
+
+.acciones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 340px;
+  justify-content: flex-end;
+}
+
+.botonDescargar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px;
+  font-family: var(--fuente-familia);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-blanco);
+  background-color: var(--color-primario);
+  border: none;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.botonDescargar:hover {
+  background-color: var(--color-primario-oscuro);
+}
+
+.botonCerrar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background-color: var(--color-error);
+  border: none;
+  border-radius: 50%;
+  color: var(--color-blanco);
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.botonCerrar:hover {
+  background-color: #dc2626; /* Un rojo ligeramente más oscuro */
+}
+
+/* --- Ticket (área que se captura como imagen) --- */
+
+.ticket {
+  background-color: #ffffff;
+  width: 340px;
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: var(--fuente-familia);
+
+  /* Fuerzo las variables a modo claro para el ticket (necesario si el modo oscuro altera :root) */
+  --color-blanco: #ffffff;
+  --color-fondo: #fafafa;
+  --color-texto: #1f2937;
+  --color-texto-secundario: #6b7280;
+  --color-borde: #e5e7eb;
+}
+
+/* --- Cabecera del ticket --- */
+
+.cabecera {
+  background-color: var(--color-primario);
+  padding: 24px 24px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.logoContenedor {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.logoImagen {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.marca {
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.slogan {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0;
+}
+
+/* --- Info de la venta --- */
+
+.infoVenta {
+  padding: 16px 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background-color: var(--color-fondo);
+}
+
+.filaDato {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.etiqueta {
+  color: var(--color-texto-secundario);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.valor {
+  color: var(--color-texto);
+  font-weight: 400;
+}
+
+/* --- Divisores --- */
+
+.divisorPunteado {
+  height: 1px;
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--color-borde) 0px,
+    var(--color-borde) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+  margin: 0;
+}
+
+.divisorSolido {
+  height: 1px;
+  background-color: var(--color-borde);
+  margin: 8px 0;
+}
+
+/* --- Lista de productos --- */
+
+.listaProductos {
+  padding: 12px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.encabezadoTabla {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-texto-secundario);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-fondo);
+  margin-bottom: 8px;
+}
+
+.lineaProducto {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 6px 0;
+}
+
+.detalleProducto {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding-right: 12px;
+}
+
+.nombreProducto {
+  font-size: 13px;
+  color: var(--color-texto);
+  font-weight: 500;
+}
+
+.metaProducto {
+  font-size: 11px;
+  color: var(--color-texto-secundario);
+  margin-top: 2px;
+}
+
+.preciosLinea {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.totalLinea {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-texto);
+  white-space: nowrap;
+}
+
+.totalLineaVES {
+  font-size: 11px;
+  color: var(--color-texto-secundario);
+  white-space: nowrap;
+}
+
+/* --- Totales --- */
+
+.totales {
+  padding: 12px 20px 16px;
+  background-color: var(--color-fondo);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filaTotalSec {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--color-texto-secundario);
+}
+
+.filaTotal {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-primario);
+}
+
+/* --- Pie del ticket --- */
+
+.pie {
+  background-color: var(--color-primario);
+  padding: 16px 24px;
+  text-align: center;
+}
+
+.pie p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.subPie {
+  font-size: 11px !important;
+  font-weight: 400 !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+  margin-top: 4px !important;
+}

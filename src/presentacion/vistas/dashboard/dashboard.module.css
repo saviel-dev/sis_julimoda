@@ -75,7 +75,7 @@
 
 /* --- Excepción a las reglas de paleta (Permitida por el usuario para Psicología de Color) --- */
 .tarjetaColorida {
-  color: var(--color-blanco);
+  color: #ffffff;
 }
 
 .bgAzul { background-color: #4b8df8; border-color: #4b8df8; } /* Ventas - Azul financiero/confianza */
@@ -84,42 +84,44 @@
 .bgRojo { background-color: #e7505a; border-color: #e7505a; } /* Alertas/Stock - Rojo */
 
 .encabezadoTarjeta {
-  font-family: var(--fuente-familia);
   font-size: 14px;
-  font-weight: 500;
   color: var(--color-texto-secundario);
   margin: 0;
 }
+
 .tarjetaColorida .encabezadoTarjeta {
   color: rgba(255, 255, 255, 0.9);
 }
 
 .centroTarjeta {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: var(--espacio-16);
+  margin-top: var(--espacio-8);
 }
 
 .iconoTarjeta {
   display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--color-primario);
 }
+
 .tarjetaColorida .iconoTarjeta {
-  color: var(--color-blanco);
+  color: #ffffff;
 }
 .iconoTarjetaError {
   color: var(--color-error);
 }
 
 .valorTarjeta {
-  font-family: var(--fuente-familia);
-  font-size: 32px;
-  font-weight: 500;
+  font-size: 28px;
+  font-weight: 700;
   color: var(--color-texto);
-  margin: 0;
 }
+
 .tarjetaColorida .valorTarjeta {
-  color: var(--color-blanco);
+  color: #ffffff;
 }
 .valorTarjetaError {
   color: var(--color-error);
@@ -129,11 +131,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-family: var(--fuente-familia);
-  font-size: 12px;
+  font-size: 13px;
   color: var(--color-texto-secundario);
-  margin: 0;
+  margin-top: auto;
+  padding-top: var(--espacio-16);
 }
+
 .tarjetaColorida .pieTarjeta {
   color: rgba(255, 255, 255, 0.9);
 }
@@ -142,8 +145,9 @@
   font-weight: 600;
   color: var(--color-texto);
 }
+
 .tarjetaColorida .subValorTarjeta {
-  color: var(--color-blanco);
+  color: #ffffff;
 }
 
 /* --- Tabla de ventas recientes --- */
