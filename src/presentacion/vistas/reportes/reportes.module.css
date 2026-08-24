@@ -1,0 +1,233 @@
+.contenedor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-24);
+  font-family: var(--fuente-familia);
+}
+
+.encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--espacio-16);
+}
+
+.textosEncabezado {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-8);
+}
+
+.botonExportar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 20px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffff;
+  background-color: var(--color-exito);
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.botonExportar:hover {
+  background-color: var(--color-exito-suave);
+  color: var(--color-exito);
+  transform: translateY(-2px);
+}
+
+.titulo {
+  font-size: var(--fuente-titulo);
+  color: var(--color-texto);
+  font-weight: 600;
+  margin: 0;
+}
+
+.descripcion {
+  font-size: 14px;
+  color: var(--color-texto-secundario);
+  margin: 0;
+}
+
+.gridResumen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--espacio-16);
+}
+
+.tarjetaColorida {
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: #ffffff;
+}
+
+.bgAzul { background-color: #4b8df8; border-color: #4b8df8; }
+.bgVerde { background-color: #26c281; border-color: #26c281; }
+.bgNaranja { background-color: #f39c12; border-color: #f39c12; }
+
+.encabezadoTarjeta {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+}
+
+.centroTarjeta {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-16);
+  margin-top: var(--espacio-8);
+}
+
+.iconoTarjeta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.valorTarjeta {
+  font-size: 28px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.pieTarjeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-top: auto;
+  padding-top: var(--espacio-16);
+}
+
+.subValorTarjeta {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.seccionDetalle {
+  background-color: var(--color-blanco);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-tarjeta);
+  padding: var(--espacio-24);
+  margin-top: var(--espacio-16);
+}
+
+.tituloSeccion {
+  font-size: 18px;
+  color: var(--color-texto);
+  font-weight: 600;
+  margin: 0 0 var(--espacio-16) 0;
+}
+
+.listaVentas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-12);
+}
+
+.itemVenta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--espacio-16);
+  background-color: var(--color-fondo-admin);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-campo);
+  transition: all 0.2s;
+}
+
+.itemVenta:hover {
+  border-color: var(--color-primario);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.izqVenta {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-16);
+}
+
+.iconoRecibo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: var(--color-primario-suave);
+  color: var(--color-primario);
+  border-radius: 50%;
+}
+
+.infoVenta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.encabezadoVenta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fechaVenta {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-texto);
+}
+
+.badgeOperacion {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  background-color: var(--color-borde);
+  color: var(--color-texto);
+  border-radius: 12px;
+}
+
+.productosVenta {
+  font-size: 13px;
+  color: var(--color-texto-secundario);
+}
+
+.montosVenta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.montoPrincipal {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-texto);
+}
+
+.montoSecundario {
+  font-size: 13px;
+  color: var(--color-texto-secundario);
+}
+
+.badgeDolar {
+  color: var(--color-exito);
+  font-weight: 600;
+}
+.badgeBs {
+  color: var(--color-primario);
+  font-weight: 600;
+}

@@ -41,3 +41,41 @@ a {
   outline: 2px solid var(--color-primario);
   outline-offset: 2px;
 }
+
+/* ============================================================
+   SweetAlert2 — Personalizacion de paleta JuliModa
+   ============================================================ */
+.swal-popup-julimoda {
+  font-family: 'Roboto', system-ui, sans-serif;
+  border-radius: 14px !important;
+  padding: 28px !important;
+}
+
+.swal-popup-julimoda .swal2-title {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: #1f1f1f !important;
+}
+
+.swal-popup-julimoda .swal2-html-container,
+.swal-popup-julimoda .swal2-content {
+  font-size: 14px !important;
+  color: #5f6368 !important;
+}
+
+.swal-popup-julimoda .swal2-icon {
+  border-width: 2px !important;
+}
+
+.swal-popup-julimoda .swal-btn-cancelar {
+  color: #5f6368 !important;
+  background-color: #f1f3f4 !important;
+}
+
+.swal-popup-julimoda .swal-btn-cancelar:hover {
+  background-color: #dadce0 !important;
+}
+
+.swal2-timer-progress-bar {
+  background: #770dee !important;
+}
