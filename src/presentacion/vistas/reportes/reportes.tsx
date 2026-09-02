@@ -66,7 +66,7 @@ export default function Reportes() {
   };
 
   return (
-    <div className={estilos.contenedor}>
+    <main className={estilos.contenedor}>
       <header className={estilos.encabezado}>
         <div className={estilos.textosEncabezado}>
           <h1 className={estilos.titulo}>Reporte de Ventas</h1>
@@ -153,6 +153,6 @@ export default function Reportes() {
           })}
         </div>
       </section>
-    </div>
+    </main>
   );
 }

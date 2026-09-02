@@ -121,7 +121,7 @@ export default function Pos() {
   };
 
   return (
-    <div className={estilos.pagina}>
+    <main className={estilos.pagina}>
       {/* Panel izquierdo: catálogo */}
       <section className={estilos.catalogo} aria-label="Catálogo de productos">
         <div className={estilos.encabezadoCatalogo}>
@@ -341,6 +341,6 @@ export default function Pos() {
           ✓ Venta registrada correctamente
         </div>
       )}
-    </div>
+    </main>
   );
 }

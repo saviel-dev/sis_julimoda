@@ -269,7 +269,7 @@ export default function Inventario() {
     : (form.precio / TASA_CAMBIO).toFixed(2) + ' USD';
 
   return (
-    <div className={estilos.pagina}>
+    <main className={estilos.pagina}>
 
       {/* Bloque de Métricas */}
       <div className={estilos.bloqueMetricas}>
@@ -734,6 +734,6 @@ export default function Inventario() {
           </div>
         </div>
       )}
-    </div>
+    </main>
   );
 }

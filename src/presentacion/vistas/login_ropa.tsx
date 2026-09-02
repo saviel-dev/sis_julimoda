@@ -64,7 +64,7 @@ export default function LoginRopa() {
   };
 
   return (
-    <div className={estilos.pagina}>
+    <main className={estilos.pagina}>
       <div className={estilos.tarjeta}>
         {/* Encabezado con logo y título */}
         <div className={estilos.encabezado}>
@@ -154,6 +154,6 @@ export default function LoginRopa() {
           </a>
         </p>
       </div>
-    </div>
+    </main>
   );
 }

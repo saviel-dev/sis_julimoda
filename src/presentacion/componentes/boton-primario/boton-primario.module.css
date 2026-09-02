@@ -6,7 +6,7 @@
   font-family: var(--fuente-familia);
   font-size: var(--fuente-cuerpo);
   font-weight: var(--fuente-peso);
-  color: var(--color-blanco);
+  color: var(--color-blanco-puro);
   background-color: var(--color-primario);
   border: none;
   border-radius: var(--radio-boton);

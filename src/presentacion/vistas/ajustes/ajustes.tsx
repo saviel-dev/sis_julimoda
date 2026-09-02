@@ -136,7 +136,7 @@ export default function Ajustes() {
   };
 
   return (
-    <div className={estilos.contenedor}>
+    <main className={estilos.contenedor}>
 
       {/* ---- COLUMNA IZQUIERDA ---- */}
       <div className={estilos.columnaIzquierda}>
@@ -429,7 +429,7 @@ export default function Ajustes() {
           </div>
         </div>
       )}
-    </div>
+    </main>
   );
 }
 

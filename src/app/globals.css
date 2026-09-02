@@ -79,3 +79,25 @@ a {
 .swal2-timer-progress-bar {
   background: #770dee !important;
 }
+
+/* ============================================================
+   Animaciones Globales
+   ============================================================ */
+@keyframes entradaOpacidad {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+section, main, article {
+  animation: entradaOpacidad 0.5s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  section, main, article {
+    animation: none;
+  }
+}
