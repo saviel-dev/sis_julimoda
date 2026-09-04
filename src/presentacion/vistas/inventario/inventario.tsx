@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Search, Filter, Plus, DollarSign, Pencil, Trash2, ChevronsUpDown, Camera, X, Loader2 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import {
-  PRODUCTOS_DEMO,
   CATEGORIAS,
   formatearPrecio,
   TASA_CAMBIO,
@@ -12,7 +11,43 @@ import {
   type CategoriaProducto,
   type TallaStock,
 } from '@/compartido/datos-demo';
+import { AdaptadorProductos } from '@/infraestructura/api/adaptador-productos';
+import { ObtenerProductos } from '@/aplicacion/casos-uso/obtener-productos';
+import { GuardarProducto } from '@/aplicacion/casos-uso/guardar-producto';
+import { EliminarProducto } from '@/aplicacion/casos-uso/eliminar-producto';
 import estilos from './inventario.module.css';
+
+/** Componente para animar números con efecto de conteo */
+function CountUpAnimation({ value, duration = 1000, decimals = 0 }: { value: number; duration?: number; decimals?: number }) {
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    let startTime: number;
+    let animationFrame: number;
+
+    const animate = (currentTime: number) => {
+      if (!startTime) startTime = currentTime;
+      const progress = Math.min((currentTime - startTime) / duration, 1);
+      
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+      const currentValue = value * easeOutQuart;
+      
+      setDisplayValue(currentValue);
+
+      if (progress < 1) {
+        animationFrame = requestAnimationFrame(animate);
+      }
+    };
+
+    animationFrame = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+    };
+  }, [value, duration]);
+
+  return <span>{decimals > 0 ? displayValue.toFixed(decimals) : Math.round(displayValue)}</span>;
+}
 
 const UMBRAL_STOCK_BAJO = 3;
 const PRODUCTO_VACIO: Omit<Producto, 'id' | 'stock'> = {
@@ -24,19 +59,34 @@ const PRODUCTO_VACIO: Omit<Producto, 'id' | 'stock'> = {
   tallas: [],
 };
 
-const generarIdProductoUnico = (productos: Producto[]): string => {
-  const idsExistentes = new Set(productos.map((producto) => producto.id));
-  let id: string;
-
-  do {
-    id = Math.floor(100000 + Math.random() * 900000).toString();
-  } while (idsExistentes.has(id));
-
-  return id;
-};
+// Instancias de los casos de uso (se crean fuera del componente para evitar recreaciones)
+const repositorio = new AdaptadorProductos();
+const casoObtener = new ObtenerProductos(repositorio);
+const casoGuardar = new GuardarProducto(repositorio);
+const casoEliminar = new EliminarProducto(repositorio);
 
 export default function Inventario() {
-  const [productos, setProductos] = useState<Producto[]>(PRODUCTOS_DEMO);
+  const [productos, setProductos] = useState<Producto[]>([]);
+  const [cargando, setCargando] = useState(true);
+  const [errorCarga, setErrorCarga] = useState('');
+
+  // Carga inicial desde Supabase
+  const cargarProductos = useCallback(async () => {
+    setCargando(true);
+    setErrorCarga('');
+    try {
+      const datos = await casoObtener.ejecutar();
+      setProductos(datos);
+    } catch {
+      setErrorCarga('No se pudo cargar el inventario. Verifica tu conexión.');
+    } finally {
+      setCargando(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    cargarProductos();
+  }, [cargarProductos]);
   const [busqueda, setBusqueda] = useState('');
   const [subiendoFoto, setSubiendoFoto] = useState(false);
   const inputArchivoRef = useRef<HTMLInputElement>(null);
@@ -145,30 +195,47 @@ export default function Inventario() {
     }));
   };
 
-  const guardarProducto = () => {
-    // Calculamos el stock total
-    const stockCalculado = form.tallas.reduce((sum, t) => sum + t.cantidad, 0);
-
-    // Si desmarcó la descripción, la quitamos
+  const guardarProducto = async () => {
     const descripcionFinal = mostrarDescripcion ? form.descripcion : undefined;
 
-    const productoGuardar = {
+    const productoAGuardar = {
       ...form,
       descripcion: descripcionFinal,
-      stock: stockCalculado
+      ...(productoEditando ? { id: productoEditando.id } : {}),
     };
 
-    if (productoEditando) {
-      setProductos((prev) =>
-        prev.map((p) => p.id === productoEditando.id ? { ...p, ...productoGuardar } : p)
-      );
-    } else {
-      setProductos((prev) => {
-        const nuevoId = generarIdProductoUnico(prev);
-        return [{ id: nuevoId, ...productoGuardar }, ...prev];
-      });
-    }
-    setModalAbierto(false);
+    const accion = productoEditando ? 'actualizar' : 'crear';
+    const titulo = productoEditando ? '¿Actualizar producto?' : '¿Crear producto?';
+    const mensaje = productoEditando 
+      ? `¿Estás seguro de que deseas actualizar "${form.nombre}"?`
+      : `¿Estás seguro de que deseas crear el producto "${form.nombre}"?`;
+
+    Swal.fire({
+      title: titulo,
+      text: mensaje,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#770dee',
+      cancelButtonColor: '#5f6368',
+      confirmButtonText: productoEditando ? 'Sí, actualizar' : 'Sí, crear',
+      cancelButtonText: 'Cancelar'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await casoGuardar.ejecutar(productoAGuardar);
+          await cargarProductos();
+          setModalAbierto(false);
+          Swal.fire({
+            title: productoEditando ? '¡Actualizado!' : '¡Creado!',
+            text: productoEditando ? 'El producto ha sido actualizado.' : 'El producto ha sido creado.',
+            icon: 'success',
+            confirmButtonColor: '#770dee'
+          });
+        } catch {
+          Swal.fire('Error', 'No se pudo guardar el producto.', 'error');
+        }
+      }
+    });
   };
 
   const borrarSeleccionados = () => {
@@ -181,16 +248,16 @@ export default function Inventario() {
       cancelButtonColor: '#5f6368',
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar'
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        setProductos(prev => prev.filter(p => !seleccionados.has(p.id)));
-        setSeleccionados(new Set());
-        Swal.fire({
-          title: '¡Eliminados!',
-          text: 'Los productos han sido eliminados.',
-          icon: 'success',
-          confirmButtonColor: '#770dee'
-        });
+        try {
+          await Promise.all([...seleccionados].map(id => casoEliminar.ejecutar(id)));
+          setSeleccionados(new Set());
+          await cargarProductos();
+          Swal.fire({ title: '¡Eliminados!', text: 'Los productos han sido eliminados.', icon: 'success', confirmButtonColor: '#770dee' });
+        } catch {
+          Swal.fire('Error', 'No se pudo eliminar uno o más productos.', 'error');
+        }
       }
     });
   };
@@ -205,20 +272,16 @@ export default function Inventario() {
       cancelButtonColor: '#5f6368',
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar'
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        setProductos(prev => prev.filter(p => p.id !== id));
-        if (seleccionados.has(id)) {
-          const nuevosSeleccionados = new Set(seleccionados);
-          nuevosSeleccionados.delete(id);
-          setSeleccionados(nuevosSeleccionados);
+        try {
+          await casoEliminar.ejecutar(id);
+          setSeleccionados(prev => { const n = new Set(prev); n.delete(id); return n; });
+          await cargarProductos();
+          Swal.fire({ title: '¡Eliminado!', text: 'El producto ha sido eliminado.', icon: 'success', confirmButtonColor: '#770dee' });
+        } catch {
+          Swal.fire('Error', 'No se pudo eliminar el producto.', 'error');
         }
-        Swal.fire({
-          title: '¡Eliminado!',
-          text: 'El producto ha sido eliminado.',
-          icon: 'success',
-          confirmButtonColor: '#770dee'
-        });
       }
     });
   };
@@ -271,6 +334,23 @@ export default function Inventario() {
   return (
     <main className={estilos.pagina}>
 
+      {/* Estado de carga inicial */}
+      {cargando && (
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '48px', color: 'var(--color-texto-secundario)' }}>
+          <Loader2 size={28} className={estilos.iconoGirando} />
+        </div>
+      )}
+
+      {/* Error de carga */}
+      {!cargando && errorCarga && (
+        <div role="alert" style={{ padding: '16px', color: 'var(--color-error)', textAlign: 'center' }}>
+          {errorCarga}
+        </div>
+      )}
+
+      {/* Contenido principal */}
+      {!cargando && !errorCarga && (
+      <>
       {/* Bloque de Métricas */}
       <div className={estilos.bloqueMetricas}>
         <div className={estilos.metricaGigante}>
@@ -278,28 +358,53 @@ export default function Inventario() {
             <div className={estilos.iconoMetrica}><DollarSign size={14} /></div>
             Valor del inventario
           </span>
-          <h2 className={estilos.valorMetrica}>{formatearPrecio(valorTotalInventario, 'USD')}</h2>
-          <span className={estilos.subtextoMetrica}>≈ {formatearPrecio(valorTotalInventarioVES, 'VES')}</span>
+          <h2 className={estilos.valorMetrica}>
+            ${<CountUpAnimation value={valorTotalInventario} duration={1500} decimals={2} />}
+          </h2>
+          <span className={estilos.subtextoMetrica}>
+            ≈ Bs <CountUpAnimation value={valorTotalInventarioVES} duration={1500} decimals={2} />
+          </span>
         </div>
 
         <div className={estilos.bloqueBarras}>
           <h3 className={estilos.tituloBarras}>
-            {totalProductos} <span>productos</span>
+            <CountUpAnimation value={totalProductos} duration={1000} /> <span>productos</span>
           </h3>
           <div className={estilos.barrasProgreso}>
-            <div className={estilos.barraAzul} style={{ width: `${(enStock / totalProductos) * 100}%` }}></div>
-            <div className={estilos.barraAmarilla} style={{ width: `${(bajoStock / totalProductos) * 100}%` }}></div>
-            <div className={estilos.barraRoja} style={{ width: `${(sinStock / totalProductos) * 100}%` }}></div>
+            <div 
+              className={estilos.barraAzul} 
+              style={{ 
+                '--target-width': `${(enStock / totalProductos) * 100}%`,
+                width: '0%',
+                animation: 'slideIn 1.5s ease-out forwards'
+              } as React.CSSProperties}
+            ></div>
+            <div 
+              className={estilos.barraAmarilla} 
+              style={{ 
+                '--target-width': `${(bajoStock / totalProductos) * 100}%`,
+                width: '0%',
+                animation: 'slideIn 1.5s ease-out forwards'
+              } as React.CSSProperties}
+            ></div>
+            <div 
+              className={estilos.barraRoja} 
+              style={{ 
+                '--target-width': `${(sinStock / totalProductos) * 100}%`,
+                width: '0%',
+                animation: 'slideIn 1.5s ease-out forwards'
+              } as React.CSSProperties}
+            ></div>
           </div>
           <div className={estilos.leyendaBarras}>
             <div className={estilos.leyendaItem}>
-              <div className={estilos.punto} style={{ backgroundColor: '#0ea5e9' }}></div> En stock: {enStock}
+              <div className={estilos.punto} style={{ backgroundColor: '#0ea5e9' }}></div> En stock: <CountUpAnimation value={enStock} duration={1000} />
             </div>
             <div className={estilos.leyendaItem}>
-              <div className={estilos.punto} style={{ backgroundColor: 'var(--color-alerta)' }}></div> Bajo stock: {bajoStock}
+              <div className={estilos.punto} style={{ backgroundColor: 'var(--color-alerta)' }}></div> Bajo stock: <CountUpAnimation value={bajoStock} duration={1000} />
             </div>
             <div className={estilos.leyendaItem}>
-              <div className={estilos.punto} style={{ backgroundColor: 'var(--color-error)' }}></div> Sin stock: {sinStock}
+              <div className={estilos.punto} style={{ backgroundColor: 'var(--color-error)' }}></div> Sin stock: <CountUpAnimation value={sinStock} duration={1000} />
             </div>
           </div>
         </div>
@@ -733,6 +838,8 @@ export default function Inventario() {
             </div>
           </div>
         </div>
+      )}
+      </>
       )}
     </main>
   );

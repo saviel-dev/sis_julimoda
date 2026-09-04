@@ -22,6 +22,7 @@ interface ReciboProps {
   subtotal: number;
   total: number;
   fecha: string;
+  tasaCambio: number;
   alCerrar: () => void;
 }
 
@@ -29,7 +30,7 @@ interface ReciboProps {
  * Componente de recibo de venta con diseño premium.
  * Permite descargar el recibo como imagen PNG.
  */
-export default function Recibo({ items, subtotal, total, fecha, alCerrar }: ReciboProps) {
+export default function Recibo({ items, subtotal, total, fecha, tasaCambio, alCerrar }: ReciboProps) {
   const reciboRef = useRef<HTMLDivElement>(null);
 
   /** Genera y descarga el recibo como imagen PNG usando html-to-image */
@@ -55,7 +56,7 @@ export default function Recibo({ items, subtotal, total, fecha, alCerrar }: Reci
     enlace.click();
   };
 
-  const totalVES = total * TASA_CAMBIO;
+  const totalVES = total * tasaCambio;
 
   return (
     <div className={estilos.overlay}>
@@ -119,7 +120,7 @@ export default function Recibo({ items, subtotal, total, fecha, alCerrar }: Reci
             </div>
             {items.map((item) => {
               const precioUSD = item.producto.moneda === 'VES'
-                ? item.producto.precio / TASA_CAMBIO
+                ? item.producto.precio / tasaCambio
                 : item.producto.precio;
               const totalLinea = precioUSD * item.cantidad;
               return (
@@ -127,12 +128,12 @@ export default function Recibo({ items, subtotal, total, fecha, alCerrar }: Reci
                   <div className={estilos.detalleProducto}>
                     <span className={estilos.nombreProducto}>{item.producto.nombre}</span>
                     <span className={estilos.metaProducto}>
-                      Talla {item.talla} · {item.cantidad} × {formatearPrecio(precioUSD, 'USD')} ({formatearPrecio(precioUSD * TASA_CAMBIO, 'VES')})
+                      Talla {item.talla} · {item.cantidad} × {formatearPrecio(precioUSD, 'USD')} ({formatearPrecio(precioUSD * tasaCambio, 'VES')})
                     </span>
                   </div>
                   <div className={estilos.preciosLinea}>
                     <span className={estilos.totalLinea}>{formatearPrecio(totalLinea, 'USD')}</span>
-                    <span className={estilos.totalLineaVES}>{formatearPrecio(totalLinea * TASA_CAMBIO, 'VES')}</span>
+                    <span className={estilos.totalLineaVES}>{formatearPrecio(totalLinea * tasaCambio, 'VES')}</span>
                   </div>
                 </div>
               );
@@ -150,7 +151,7 @@ export default function Recibo({ items, subtotal, total, fecha, alCerrar }: Reci
             </div>
             <div className={estilos.filaTotalSec}>
               <span>Subtotal Bs.</span>
-              <span>{formatearPrecio(subtotal * TASA_CAMBIO, 'VES')}</span>
+              <span>{formatearPrecio(subtotal * tasaCambio, 'VES')}</span>
             </div>
             <div className={estilos.divisorSolido} />
             <div className={estilos.filaTotal}>

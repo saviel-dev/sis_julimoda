@@ -19,7 +19,6 @@ import {
   Moon
 } from 'lucide-react';
 import Image from 'next/image';
-import { PRODUCTOS_DEMO, VENTAS_RECIENTES_DEMO } from '@/compartido/datos-demo';
 import { sesionLocal } from '@/infraestructura/almacenamiento/sesion-local';
 import estilos from './header-admin.module.css';
 
@@ -79,8 +78,8 @@ export default function HeaderAdmin({ minimizada, onToggleMinimizar }: PropsHead
     }
   };
   
-  const cerrarSesion = () => {
-    sesionLocal.eliminar();
+  const cerrarSesion = async () => {
+    await sesionLocal.eliminar();
     router.push('/');
   };
 
@@ -92,24 +91,6 @@ export default function HeaderAdmin({ minimizada, onToggleMinimizar }: PropsHead
     ...SECCIONES_BUSQUEDA.filter((seccion) =>
       normalizar(`${seccion.titulo} ${seccion.detalle}`).includes(termino)
     ),
-    ...PRODUCTOS_DEMO.filter((producto) =>
-      normalizar(`${producto.nombre} ${producto.id} ${producto.categoria} ${producto.descripcion ?? ''}`).includes(termino)
-    ).map((producto) => ({
-      id: `producto-${producto.id}`,
-      titulo: producto.nombre,
-      detalle: `${producto.categoria} · ID ${producto.id}`,
-      href: '/admin/inventario',
-      icono: <Package size={20} />,
-    })),
-    ...VENTAS_RECIENTES_DEMO.filter((venta) =>
-      normalizar(`${venta.id} ${venta.productos} ${venta.estado}`).includes(termino)
-    ).map((venta) => ({
-      id: `venta-${venta.id}`,
-      titulo: `Venta ${venta.id}`,
-      detalle: `${venta.productos} · ${venta.estado}`,
-      href: '/admin/dashboard',
-      icono: <ShoppingCart size={20} />,
-    })),
   ].slice(0, 7) : [];
 
   const abrirResultado = (resultado: ResultadoBusqueda) => {

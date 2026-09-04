@@ -381,7 +381,7 @@
   height: 32px;
   padding: 0 16px;
   border: none;
-  border-radius: 16px;
+  border-radius: 0;
   background-color: transparent;
   color: var(--color-primario);
   font-family: var(--fuente-familia);
@@ -399,9 +399,9 @@
   height: 32px;
   padding: 0 16px;
   border: none;
-  border-radius: 16px;
+  border-radius: 4px;
   background-color: var(--color-primario);
-  color: var(--color-blanco);
+  color: #ffffff !important;
   font-family: var(--fuente-familia);
   font-size: 13px;
   font-weight: 500;

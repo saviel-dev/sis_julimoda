@@ -1,17 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
-  PRODUCTOS_DEMO,
   CATEGORIAS,
   formatearPrecio,
   TASA_CAMBIO,
   type Producto,
   type CategoriaProducto,
 } from '@/compartido/datos-demo';
-import { Image as ImageIcon, X } from 'lucide-react';
+import { AdaptadorProductos } from '@/infraestructura/api/adaptador-productos';
+import { AdaptadorVentas } from '@/infraestructura/api/adaptador-ventas';
+import { ObtenerProductos } from '@/aplicacion/casos-uso/obtener-productos';
+import { RegistrarVenta } from '@/aplicacion/casos-uso/registrar-venta';
+import { ActualizarStock } from '@/aplicacion/casos-uso/actualizar-stock';
+import { Image as ImageIcon, X, Loader2 } from 'lucide-react';
 import Recibo from '@/presentacion/componentes/recibo/recibo';
 import estilos from './pos.module.css';
+
+const casoProductos = new ObtenerProductos(new AdaptadorProductos());
+const casoRegistrar = new RegistrarVenta(new AdaptadorVentas());
+const casoActualizarStock = new ActualizarStock(new AdaptadorProductos());
 
 interface ItemCarrito {
   idVirtual: string;
@@ -28,11 +36,14 @@ interface ItemCarrito {
  * Al confirmar la venta, el carrito se limpia.
  */
 export default function Pos() {
+  const [productos, setProductos] = useState<Producto[]>([]);
+  const [cargando, setCargando] = useState(true);
   const [carrito, setCarrito] = useState<ItemCarrito[]>([]);
   const [busqueda, setBusqueda] = useState('');
   const [categoriaFiltro, setCategoriaFiltro] = useState<CategoriaProducto | ''>('');
   const [toastVisible, setToastVisible] = useState(false);
   const [productoSeleccionado, setProductoSeleccionado] = useState<Producto | null>(null);
+  const [tasaCambio, setTasaCambio] = useState(TASA_CAMBIO);
   const [reciboData, setReciboData] = useState<{
     items: ItemCarrito[];
     subtotal: number;
@@ -40,8 +51,33 @@ export default function Pos() {
     fecha: string;
   } | null>(null);
 
+  // Carga de catálogo desde Supabase
+  const cargarProductos = useCallback(async () => {
+    setCargando(true);
+    try {
+      const datos = await casoProductos.ejecutar();
+      setProductos(datos);
+    } catch {
+      // Si falla, catálogo vacío
+    } finally {
+      setCargando(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    cargarProductos();
+  }, [cargarProductos]);
+
+  // Cargar la tasa de cambio desde localStorage si está disponible
+  useEffect(() => {
+    const tasaGuardada = localStorage.getItem('tasaCambio');
+    if (tasaGuardada) {
+      setTasaCambio(parseFloat(tasaGuardada));
+    }
+  }, []);
+
   /* Productos filtrados para el catálogo */
-  const productosFiltrados = PRODUCTOS_DEMO.filter((p) => {
+  const productosFiltrados = productos.filter((p) => {
     const coincideBusqueda = p.nombre.toLowerCase().includes(busqueda.toLowerCase());
     const coincideCategoria = categoriaFiltro === '' || p.categoria === categoriaFiltro;
     return coincideBusqueda && coincideCategoria && p.stock > 0;
@@ -99,7 +135,7 @@ export default function Pos() {
   /* Cálculos del resumen */
   const subtotal = carrito.reduce(
     (suma, item) => {
-      const precioUnificado = item.producto.moneda === 'VES' ? item.producto.precio / TASA_CAMBIO : item.producto.precio;
+      const precioUnificado = item.producto.moneda === 'VES' ? item.producto.precio / tasaCambio : item.producto.precio;
       return suma + precioUnificado * item.cantidad;
     },
     0
@@ -107,8 +143,35 @@ export default function Pos() {
   const total = subtotal;
   const cantidadItems = carrito.reduce((suma, item) => suma + item.cantidad, 0);
 
-  /** Confirma la venta y limpia el carrito */
-  const confirmarVenta = () => {
+  /** Confirma la venta, la persiste en Supabase y limpia el carrito */
+  const confirmarVenta = async () => {
+    const descripcionProductos = carrito
+      .map(item => `${item.producto.nombre} x${item.cantidad}`)
+      .join(', ');
+
+    try {
+      // Actualizar stock de cada producto vendido
+      for (const item of carrito) {
+        await casoActualizarStock.ejecutar(item.producto.id, item.talla, item.cantidad);
+      }
+
+      // Registrar la venta
+      await casoRegistrar.ejecutar({
+        productos: descripcionProductos,
+        total,
+        moneda: 'USD',
+        estado: 'Completada',
+        fecha: new Date().toISOString(),
+      });
+
+      // Recargar productos para mostrar stock actualizado
+      await cargarProductos();
+    } catch (error) {
+      console.error('Error al procesar la venta:', error);
+      // Si falla, no bloqueamos al usuario pero mostramos error
+      return;
+    }
+
     setReciboData({
       items: [...carrito],
       subtotal,
@@ -155,8 +218,8 @@ export default function Pos() {
         {/* Grilla de productos */}
         <div className={estilos.gridProductos}>
           {productosFiltrados.map((producto) => {
-            const precioUSD = producto.moneda === 'USD' ? producto.precio : producto.precio / TASA_CAMBIO;
-            const precioVES = producto.moneda === 'VES' ? producto.precio : producto.precio * TASA_CAMBIO;
+            const precioUSD = producto.moneda === 'USD' ? producto.precio : producto.precio / tasaCambio;
+            const precioVES = producto.moneda === 'VES' ? producto.precio : producto.precio * tasaCambio;
 
             return (
               <button
@@ -218,10 +281,10 @@ export default function Pos() {
                 <p className={estilos.metaItemCarrito}>Talla: {item.talla}</p>
                 <div className={estilos.preciosItemCarrito}>
                   <span className={estilos.precioDolares}>
-                    {formatearPrecio(item.producto.moneda === 'USD' ? item.producto.precio : item.producto.precio / TASA_CAMBIO, 'USD')} c/u
+                    {formatearPrecio(item.producto.moneda === 'USD' ? item.producto.precio : item.producto.precio / tasaCambio, 'USD')} c/u
                   </span>
                   <span className={estilos.precioBolivares}>
-                    {formatearPrecio(item.producto.moneda === 'VES' ? item.producto.precio : item.producto.precio * TASA_CAMBIO, 'VES')} c/u
+                    {formatearPrecio(item.producto.moneda === 'VES' ? item.producto.precio : item.producto.precio * tasaCambio, 'VES')} c/u
                   </span>
                 </div>
               </div>
@@ -254,15 +317,15 @@ export default function Pos() {
           </div>
           <div className={estilos.filaResumen}>
             <span>Subtotal (Bs.)</span>
-            <span>{formatearPrecio(subtotal * TASA_CAMBIO, 'VES')}</span>
+            <span>{formatearPrecio(subtotal * tasaCambio, 'VES')}</span>
           </div>
           <div className={estilos.filaTotal}>
             <span>Total USD</span>
-            <strong>{formatearPrecio(total, 'USD')}</strong>
+            <span>{formatearPrecio(total, 'USD')}</span>
           </div>
           <div className={estilos.filaTotalSecundario}>
             <span>Total Bs.</span>
-            <strong>{formatearPrecio(total * TASA_CAMBIO, 'VES')}</strong>
+            <strong>{formatearPrecio(total * tasaCambio, 'VES')}</strong>
           </div>
         </div>
 
@@ -331,6 +394,7 @@ export default function Pos() {
           subtotal={reciboData.subtotal}
           total={reciboData.total}
           fecha={reciboData.fecha}
+          tasaCambio={tasaCambio}
           alCerrar={() => setReciboData(null)}
         />
       )}

@@ -1,5 +1,14 @@
 /* Estilos del módulo de inventario - Estilo Referencia (Zendenta) */
 
+@keyframes slideIn {
+  from {
+    width: 0%;
+  }
+  to {
+    width: var(--target-width, 100%);
+  }
+}
+
 .pagina {
   max-width: 1200px;
   margin: 0 auto;
